@@ -13,13 +13,13 @@ end
 
 # Brute force method from Levitin p.104
 
-def bruteForceStringSearch(text,search)
-	return nil if search.nil? or text.nil?
+def bruteForceStringSearch(text,pattern)
+	return nil if pattern.nil? or text.nil?
 	n = text.length
-	m = search.length
+	m = pattern.length
 	0.upto(n-m) do |i|
 		j = 0
-		while (j < m) and text[i+j] == search[j] do
+		while (j < m) and text[i+j] == pattern[j] do
 			j += 1
 		end
 		return i if j==m
@@ -30,13 +30,13 @@ end
 # Brute Force Second ended
 
 # Boyer-Moore String Search from Levitin 259
-def boyerMooreStringSearch(text,search,bad_symbol_shift,good_suffix_shift)
-	return nil if search.nil? or text.nil?
-  text, search = text.unpack('U*'), search.unpack('U*')
+def boyerMooreStringSearch(text,pattern,bad_symbol_shift,good_suffix_shift)
+	return nil if pattern.nil? or text.nil?
+  text, pattern = text.unpack('U*'), pattern.unpack('U*')
     n=0  
-    while (n <= text.length - search.length) do  
-      m = search.length-1  
-      while (search[m] == text[m+n]) do
+    while (n <= text.length - pattern.length) do  
+      m = pattern.length-1  
+      while (pattern[m] == text[m+n]) do
         return n if m==0  
         m -= 1;  
       end  
@@ -47,52 +47,52 @@ def boyerMooreStringSearch(text,search,bad_symbol_shift,good_suffix_shift)
 end
 
 # Preprocess the bad symbol table
-def bmBadSymbolTable(search)
-	return nil if search.nil?
-  search = search.unpack('U*')
+def bmBadSymbolTable(pattern)
+	return nil if pattern.nil?
+  pattern = pattern.unpack('U*')
 	# maps the default value to the last char in our table
 	bad_char_shift = Hash.new {-1}
-	search[0...-2].each_with_index{|char,index| bad_char_shift[char] = index}
+	pattern[0...-2].each_with_index{|char,index| bad_char_shift[char] = index}
 	return bad_char_shift
 end
 
 # Preprocess the good symbol table
-def bmAltGoodSuffixTable(search)
-  search = search.unpack('U*')
+def bmAltGoodSuffixTable(pattern)
+  pattern = pattern.unpack('U*')
   goodSuffix = []
-  search.length.times do |i|  
+  pattern.length.times do |i|  
       value=0  
-      while (value < search.length && !suffixmatch(search, i, value)) do  
+      while (value < pattern.length && !suffixmatch(pattern, i, value)) do  
         value+=1  
       end  
-      goodSuffix[search.length-i-1] = value  
+      goodSuffix[pattern.length-i-1] = value  
     end  
     return goodSuffix
 end
-def suffixmatch(search, length, offset)  
-  #cut off offset bytes from search  
-  search_begin = search.first(search.length-offset)  
+def suffixmatch(pattern, length, offset)  
+  #cut off offset bytes from pattern  
+  pattern_begin = pattern.first(pattern.length-offset)  
       
-  #if both search and search_begin contain at least length+1 bytes 
-  if (search_begin.length > length)  
-    search[-length-1] != search_begin[-length-1]  &&  
-    search.last(length) == search_begin.last(length)  
+  #if both pattern and pattern_begin contain at least length+1 bytes 
+  if (pattern_begin.length > length)  
+    pattern[-length-1] != pattern_begin[-length-1]  &&  
+    pattern.last(length) == pattern_begin.last(length)  
   else  
-    search.last(search_begin.length) == search_begin  
+    pattern.last(pattern_begin.length) == pattern_begin  
   end  
 end
 
 
 # Boyer-Moore Section ended
 
-# KMP Search using the "prefixTable" from CLRS pg. 1004
-def knuthMorrisPrattStringSearch(text, search, prefixTable)
-  return nil if search.nil? or text.nil?
+# KMP search using the "prefixTable" from CLRS pg. 1004
+def knuthMorrisPrattStringSearch(text, pattern, prefixTable)
+  return nil if pattern.nil? or text.nil?
   n = text.length
-  m = search.length
+  m = pattern.length
   q = k = 0
   while (k + q < n)
-   if search[q] == text[q+k]
+   if pattern[q] == text[q+k]
       if q == (m - 1)
         return k
       end
@@ -110,14 +110,14 @@ end
 
 
 # Compute our table for KMP
-def kmpPrefixTable(search)
-  return nil if search.nil?
+def kmpPrefixTable(pattern)
+  return nil if pattern.nil?
     prefixTable = [-1,0]
-    m = search.length
+    m = pattern.length
     q = 2
     k = 0
     while q < m
-      if search[q-1] == search[k]
+      if pattern[q-1] == pattern[k]
         k += 1
         prefixTable[q] = k
         q += 1
@@ -134,17 +134,17 @@ end
 # KMP section ended 
 
 # Rabin Karp String Search from CLRS pg. 993
-def rabinKarpStringSearch(text, search)
-  return nil if search.nil? or text.nil?
+def rabinKarpStringSearch(text, pattern)
+  return nil if pattern.nil? or text.nil?
   n = text.length
-  m = search.length
+  m = pattern.length
 
-  searchHash = hash_of(search)
+  patternHash = hash_of(pattern)
   textHash = hash_of(text[0,m])  
 
   0.upto(n-m) do |i|
-    if textHash == searchHash
-      if text[i..i+m-1] == search
+    if textHash == patternHash
+      if text[i..i+m-1] == pattern
         return i
       end
     end
@@ -155,17 +155,17 @@ def rabinKarpStringSearch(text, search)
   nil
 end
 
-def rollingHashRabinKarp(text, search)
-  return nil if search.nil? or text.nil?
+def rollingHashRabinKarp(text, pattern)
+  return nil if pattern.nil? or text.nil?
   n = text.length
-  m = search.length 
+  m = pattern.length 
 
-  searchHash = rollinghash(search)
+  patternHash = rollinghash(pattern)
   textHash = rollinghash(text[0,m])  
 
   0.upto(n-m) do |i|
-    if textHash == searchHash
-      if text[i..i+m-1] == search
+    if textHash == patternHash
+      if text[i..i+m-1] == pattern
         return i
       end
     end
