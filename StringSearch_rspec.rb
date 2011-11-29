@@ -35,7 +35,7 @@ def boyerMooreStringSearch(text,pattern,bad_symbol_shift,good_suffix_shift)
   text, pattern = text.unpack('U*'), pattern.unpack('U*')
     n=0  
     while (n <= text.length - pattern.length) do  
-      m = pattern.length-1  
+      m = pattern.length - 1 
       while (pattern[m] == text[m+n]) do
         return n if m==0  
         m -= 1;  
@@ -249,11 +249,8 @@ describe "Brute Force string search" do
     bruteForceStringSearch(text,search).should == text.index(search)
   end
   it "should find a random key in a pseudorandom text" do
-    search = Array.new{rand(256)}
-    text = Array.new{64000}
-    search.fill {rand(256).to_c}
-    text.fill{rand(256).to_c}
-    text.insert(rand(64000),search)
+    search = (0...64).map{65.+(rand(25)).chr}.join
+    text = (0...6400).map{65.+(rand(25)).chr}.join
     bruteForceStringSearch(text.to_s,search.to_s).should == text.to_s.index(search.to_s)
   end
 end
@@ -280,12 +277,9 @@ describe "Boyer Moore string search" do
     boyerMooreStringSearch(text,search,bmBadSymbolTable(search),bmAltGoodSuffixTable(search)).should == text.index(search)
   end
     it "should find a random key in a pseudorandom text" do
-    search = Array.new{rand(256)}
-    text = Array.new{64000}
-    search.fill {rand(256).to_c}
-    text.fill{rand(256).to_c}
-    text.insert(rand(64000),search)
-    boyerMooreStringSearch(text.to_s,search.to_s,bmBadSymbolTable(search.to_s),bmAltGoodSuffixTable(search.to_s)).should == text.to_s.index(search.to_s)
+    search = (0...64).map{65.+(rand(25)).chr}.join
+    text = (0...6400).map{65.+(rand(25)).chr}.join
+    boyerMooreStringSearch(text,search,bmBadSymbolTable(search),bmAltGoodSuffixTable(search)).should == text.index(search)
   end
 end
 
@@ -311,11 +305,8 @@ describe "Knuth-Morris-Pratt string search" do
     knuthMorrisPrattStringSearch(text, search, kmpPrefixTable(search)).should == text.index(search)
   end
     it "should find a random key in a pseudorandom text" do
-    search = Array.new{rand(256)}
-    text = Array.new{64000}
-    search.fill {rand(256).to_c}
-    text.fill{rand(256).to_c}
-    text.insert(rand(64000),search)
+    search = (0...64).map{65.+(rand(25)).chr}.join
+    text = (0...6400).map{65.+(rand(25)).chr}.join
     knuthMorrisPrattStringSearch(text.to_s,search.to_s,kmpPrefixTable(search.to_s)).should == text.to_s.index(search.to_s)
   end
 end
@@ -337,11 +328,8 @@ describe "Rabin-Karp string search" do
     rabinKarpStringSearch(text,search).should == text.index(search)
   end
     it "should find a random key in a pseudorandom text" do
-    search = Array.new{256}
-    text = Array.new{6400}
-    search.fill {rand(256).to_c}
-    text.fill{rand(256).to_c}
-    text.insert(rand(6398),search)
+    search = (0...64).map{65.+(rand(25)).chr}.join
+    text = (0...6400).map{65.+(rand(25)).chr}.join
     rabinKarpStringSearch(text.to_s,search.to_s).should == text.to_s.index(search.to_s)
   end
 end
@@ -362,11 +350,8 @@ describe "Rabin-Karp String Search with rolling hash" do
     rollingHashRabinKarp(text,search).should == text.index(search)
   end
     it "should find a random key in a pseudorandom text" do
-    search = Array.new{rand(256)}
-    text = Array.new{64000}
-    search.fill {rand(256).to_c}
-    text.fill{rand(256).to_c}
-    text.insert(rand(64000),search)
+    search = (0...64).map{65.+(rand(25)).chr}.join
+    text = (0...6400).map{65.+(rand(25)).chr}.join
     rollingHashRabinKarp(text.to_s,search.to_s).should == text.to_s.index(search.to_s)
   end
 end
